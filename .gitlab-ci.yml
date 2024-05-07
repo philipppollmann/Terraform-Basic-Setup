@@ -1,0 +1,62 @@
+stages:
+  - init
+  - plan
+  - apply
+
+variables:
+  TF_ROOT: ${CI_PROJECT_DIR}/stages
+
+terraform_init_dev:
+  stage: init
+  script:
+    - cd ${TF_ROOT}/dev
+    - terraform init
+  only:
+    - main
+
+terraform_plan_dev:
+  stage: plan
+  script:
+    - cd ${TF_ROOT}/dev
+    - terraform plan -out=tfplan
+  artifacts:
+    paths:
+      - ${TF_ROOT}/dev/tfplan
+  only:
+    - main
+
+terraform_apply_dev:
+  stage: apply
+  script:
+    - cd ${TF_ROOT}/dev
+    - terraform apply -auto-approve tfplan
+  only:
+    - main
+  when: manual
+
+terraform_init_prod:
+  stage: init
+  script:
+    - cd ${TF_ROOT}/prod
+    - terraform init
+  only:
+    - main
+
+terraform_plan_prod:
+  stage: plan
+  script:
+    - cd ${TF_ROOT}/prod
+    - terraform plan -out=tfplan
+  artifacts:
+    paths:
+      - ${TF_ROOT}/prod/tfplan
+  only:
+    - main
+
+terraform_apply_prod:
+  stage: apply
+  script:
+    - cd ${TF_ROOT}/prod
+    - terraform apply -auto-approve tfplan
+  only:
+    - main
